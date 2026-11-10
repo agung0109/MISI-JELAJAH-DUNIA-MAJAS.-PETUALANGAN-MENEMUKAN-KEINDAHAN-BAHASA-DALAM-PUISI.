@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mengenali Majas Dalam Puisi - Kitab Kerajaan Bahasa</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=MedievalSharp&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        parchment: {
+                            light: '#f7eed6',
+                            DEFAULT: '#efe2c3',
+                            dark: '#dfcfa7',
+                            border: '#c5ab78'
+                        },
+                        medieval: {
+                            gold: '#d4af37',
+                            darkGold: '#aa820a',
+                            crimson: '#8b0000',
+                            brightRed: '#bc1c1c',
+                            wood: '#2a1a0e',
+                            woodDark: '#190e07',
+                            ink: '#2b1e16',
+                            accent: '#4a2c11'
+                        }
+                    },
+                    fontFamily: {
+                        medieval: ['MedievalSharp', 'cursive'],
+                        cinzel: ['Cinzel', 'serif'],
+                        body: ['Plus Jakarta Sans', 'sans-serif'],
+                        gothic: ['UnifrakturMaguntia', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Medieval Styling */
+        body {
+            background-color: #120a05;
+            color: #2b1e16;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .bg-wood-pattern {
+            background: radial-gradient(circle at center, #2c1b10 0%, #170c06 100%);
+            background-image: 
+                radial-gradient(rgba(212, 175, 55, 0.05) 1px, transparent 0),
+                radial-gradient(circle at center, #2c1b10 0%, #140904 100%);
+            background-size: 24px 24px, 100% 100%;
+        }
+
+        .parchment-box {
+            background-color: #efe2c3;
+            background-image: radial-gradient(#dfcfa7 1px, transparent 0);
+            background-size: 16px 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 50px rgba(139, 94, 60, 0.3);
+            border: 4px solid #b89759;
+            position: relative;
+        }
+
+        .gold-border {
+            border-image: linear-gradient(to bottom right, #f3e5ab, #d4af37, #996515, #d4af37, #f3e5ab) 1;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fff2c4 0%, #d4af37 50%, #aa7c11 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Red Wax Seal */
+        .wax-seal {
+            background: radial-gradient(circle at 35% 35%, #e63946, #8b0000 70%, #4a0000);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2a1a0e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b89759;
+            border-radius: 4px;
+        }
+
+        /* Animations */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 5px rgba(212,175,55,0.4)); }
+            50% { opacity: 1; filter: drop-shadow(0 0 15px rgba(212,175,55,0.8)); }
+        }
+        .glow-effect {
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        /* 3D Flip Card */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .flipped {
+            transform: rotateY(180deg);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="bg-wood-pattern min-h-screen text-medieval-ink flex flex-col justify-between overflow-x-hidden relative">
+
+    <!-- Canvas Background for Magical Dust/Embers -->
+    <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+
+    <!-- Top Banner & Audio Control Header -->
+    <header class="relative z-20 bg-medieval-woodDark/90 border-b-2 border-medieval-gold/40 px-4 py-2.5 flex items-center justify-between text-medieval-gold shadow-md">
+        <div class="flex items-center space-x-3">
+            <div class="wax-seal w-8 h-8 rounded-full flex items-center justify-center text-amber-100 font-cinzel font-bold text-xs border border-yellow-300/40">
+                <i class="fa-solid fa-scroll text-sm"></i>
+            </div>
+            <div>
+                <h1 class="font-cinzel text-xs sm:text-sm font-bold tracking-wider text-amber-200 uppercase leading-none">Kitab Majas Kerajaan</h1>
+                <p class="text-[10px] sm:text-xs text-amber-400/80 font-medieval leading-tight">Bahasa Indonesia • Kelas XI SMA</p>
+            </div>
+        </div>
+
+        <!-- Audio & Index Controls -->
+        <div class="flex items-center space-x-2">
+            <button id="toggleAudioBtn" onclick="toggleAudio()" class="px-2.5 py-1.5 rounded-lg bg-medieval-wood border border-medieval-gold/40 hover:border-medieval-gold text-amber-300 text-xs flex items-center space-x-1.5 transition active:scale-95" title="Toggle Efek Suara">
+                <i id="audioIcon" class="fa-solid fa-volume-high text-amber-400"></i>
+                <span id="audioText" class="hidden sm:inline text-[11px] font-semibold">Suara: On</span>
+            </button>
+            <button onclick="openSlideMap()" class="px-2.5 py-1.5 rounded-lg bg-medieval-crimson hover:bg-red-900 border border-amber-400/50 text-amber-200 text-xs font-semibold flex items-center space-x-1.5 transition active:scale-95" title="Peta Naskah">
+                <i class="fa-solid fa-[#fa-map] fa-map text-amber-300"></i>
+                <span class="hidden sm:inline">Peta Slide</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Progress Indicator Bar -->
+    <div class="relative z-20 bg-black/40 h-1.5 w-full">
+        <div id="progressBar" class="h-full bg-gradient-to-r from-amber-600 via-medieval-gold to-yellow-300 transition-all duration-500" style="width: 7.14%;"></div>
+    </div>
+
+    <!-- MAIN CONTAINER SLIDES -->
+    <main class="relative z-10 flex-1 flex items-center justify-center p-2 sm:p-4 md:p-6 my-auto">
+        <div class="w-full max-w-4xl">
+            
+            <!-- OUTER PARCHMENT FRAME -->
+            <div class="parchment-box rounded-2xl p-4 sm:p-7 md:p-9 min-h-[500px] sm:min-h-[540px] flex flex-col justify-between transition-all duration-300 relative overflow-hidden">
+                
+                <!-- Corner Medieval Ornaments (SVGs) -->
+                <div class="absolute top-2 left-2 w-8 h-8 pointer-events-none text-medieval-gold/60">
+                    <svg viewBox="0 0 40 40" fill="currentColor"><path d="M0,0 L15,0 L15,3 L3,3 L3,15 L0,15 Z M5,5 L10,5 L10,7 L7,7 L7,10 L5,10 Z"/></svg>
+                </div>
+                <div class="absolute top-2 right-2 w-8 h-8 pointer-events-none text-medieval-gold/60 transform rotate-90">
+                    <svg viewBox="0 0 40 40" fill="currentColor"><path d="M0,0 L15,0 L15,3 L3,3 L3,15 L0,15 Z M5,5 L10,5 L10,7 L7,7 L7,10 L5,10 Z"/></svg>
+                </div>
+                <div class="absolute bottom-2 left-2 w-8 h-8 pointer-events-none text-medieval-gold/60 transform -rotate-90">
+                    <svg viewBox="0 0 40 40" fill="currentColor"><path d="M0,0 L15,0 L15,3 L3,3 L3,15 L0,15 Z M5,5 L10,5 L10,7 L7,7 L7,10 L5,10 Z"/></svg>
+                </div>
+                <div class="absolute bottom-2 right-2 w-8 h-8 pointer-events-none text-medieval-gold/60 transform rotate-180">
+                    <svg viewBox="0 0 40 40" fill="currentColor"><path d="M0,0 L15,0 L15,3 L3,3 L3,15 L0,15 Z M5,5 L10,5 L10,7 L7,7 L7,10 L5,10 Z"/></svg>
+                </div>
+
+                <!-- DYNAMIC SLIDE CONTENT VIEWPORT -->
+                <div id="slideContent" class="flex-1 flex flex-col justify-center">
+                    <!-- Slides injected by JavaScript -->
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER NAVIGATION BAR -->
+    <footer class="relative z-20 bg-medieval-woodDark border-t-2 border-medieval-gold/40 px-3 py-3 sm:px-6 flex items-center justify-between text-amber-200 shadow-2xl">
+        
+        <!-- Previous Button -->
+        <button id="prevBtn" onclick="prevSlide()" class="px-3.5 py-2 rounded-xl bg-medieval-wood hover:bg-amber-950 border border-medieval-gold/50 text-amber-300 font-cinzel font-bold text-xs sm:text-sm flex items-center space-x-2 transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-chevron-left text-xs"></i>
+            <span class="hidden xs:inline">Sebelumnya</span>
+        </button>
+
+        <!-- Current Slide Indicator -->
+        <div class="text-center px-2">
+            <span id="slideCounter" class="font-medieval text-xs sm:text-base text-amber-300 font-semibold tracking-wide">
+                Gulungan <span id="currentSlideNum" class="text-amber-100 font-bold">1</span> dari <span class="text-amber-400">14</span>
+            </span>
+            <div id="slideTitleMini" class="text-[10px] sm:text-xs text-amber-400/70 font-cinzel truncate max-w-[140px] sm:max-w-[260px] mx-auto">
+                Sampul Realm Majas
+            </div>
+        </div>
+
+        <!-- Next Button -->
+        <button id="nextBtn" onclick="nextSlide()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-medieval-crimson to-red-900 hover:from-red-700 hover:to-red-900 border border-yellow-400/60 text-amber-100 font-cinzel font-bold text-xs sm:text-sm flex items-center space-x-2 shadow-lg transition active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed">
+            <span class="hidden xs:inline">Selanjutnya</span>
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+
+    </footer>
+
+    <!-- MODAL: PETA SLIDE (SLIDE INDEX MAP) -->
+    <div id="slideMapModal" class="fixed inset-0 bg-black/85 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-medieval-wood border-2 border-medieval-gold rounded-2xl w-full max-w-3xl p-5 sm:p-6 max-h-[85vh] flex flex-col shadow-2xl relative">
+            <div class="flex items-center justify-between border-b border-medieval-gold/30 pb-3 mb-4">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-map-location-dot text-medieval-gold text-xl"></i>
+                    <h3 class="font-cinzel text-lg sm:text-xl font-bold text-amber-200">Peta Gulungan Naskah</h3>
+                </div>
+                <button onclick="closeSlideMap()" class="w-8 h-8 rounded-full bg-red-900/80 hover:bg-red-700 text-amber-100 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto pr-1">
+                <div id="slideMapGrid" class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-2.5">
+                    <!-- Dynamic Slide Buttons Injected Here -->
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-3 border-t border-medieval-gold/20 flex justify-between items-center text-xs text-amber-400/80">
+                <span>Pilih gulungan naskah untuk melompat langsung</span>
+                <button onclick="closeSlideMap()" class="px-3 py-1.5 bg-medieval-woodDark border border-medieval-gold/40 rounded-lg text-amber-300 hover:bg-amber-950">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO SYNTHESIZER SCRIPT (WEB AUDIO API) -->
+    <script>
+        let audioCtx = null;
+        let audioEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) {
+                    audioCtx = new AudioContext();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const icon = document.getElementById('audioIcon');
+            const text = document.getElementById('audioText');
+            if (audioEnabled) {
+                icon.className = "fa-solid fa-volume-high text-amber-400";
+                text.innerText = "Suara: On";
+                playHarpSound();
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-gray-400";
+                text.innerText = "Suara: Off";
+            }
+        }
+
+        // Synthesize Medieval Sound Effects
+        function playHarpSound() {
+            if (!audioEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            const notes = [440, 554.37, 659.25, 880]; // A4, C#5, E5, A5 harp arpeggio
+            notes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + index * 0.06);
+                
+                gain.gain.setValueAtTime(0.15, now + index * 0.06);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + index * 0.06 + 0.6);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + index * 0.06);
+                osc.stop(now + index * 0.06 + 0.6);
+            });
+        }
+
+        function playCorrectSound() {
+            if (!audioEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            // Royal Trumpet Chime
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+
+                gain.gain.setValueAtTime(0.2, now + idx * 0.08);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.08 + 0.7);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now + idx * 0.08);
+                osc.stop(now + idx * 0.08 + 0.7);
+            });
+        }
+
+        function playWrongSound() {
+            if (!audioEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(180, now);
+            osc.frequency.exponentialRampToValueAtTime(110, now + 0.3);
+
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.3);
+        }
+
+        function playClickSound() {
+            if (!audioEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(300, now + 0.08);
+
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.08);
+        }
+    </script>
+
+    <!-- BACKGROUND CANVAS PARTICLES -->
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 20;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedY = Math.random() * 0.8 + 0.2;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.7 + 0.2;
+                this.color = Math.random() > 0.5 ? '#d4af37' : '#ffb703';
+            }
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                if (this.y < -10) this.reset();
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#d4af37';
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        for (let i = 0; i < 45; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+    </script>
+
+    <!-- MAIN INTERACTIVE SLIDE LOGIC & CONTENT -->
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 14;
+
+        // Quiz State
+        const quizAnswers = {
+            1: null,
+            2: null,
+            3: null,
+            4: null
+        };
+        const correctQuizAnswers = {
+            1: 'B', // Ombak berkejaran -> Personifikasi
+            2: 'A', // Kakak tulang punggung -> Metafora
+            3: 'C', // Menunggu seribu tahun -> Hiperbola
+            4: 'D'  // Wajah seperti bulan -> Simile
+        };
+
+        const slidesData = [
+            { id: 1, title: "Sampul Realm Majas" },
+            { id: 2, title: "Tujuan Pembelajaran" },
+            { id: 3, title: "Pengertian Majas" },
+            { id: 4, title: "Jenis-Jenis Majas" },
+            { id: 5, title: "Majas Metafora" },
+            { id: 6, title: "Majas Personifikasi" },
+            { id: 7, title: "Majas Hiperbola" },
+            { id: 8, title: "Majas Simile" },
+            { id: 9, title: "Metafora vs Simile" },
+            { id: 10, title: "Bedah Puisi Interaktif" },
+            { id: 11, title: "Panduan Identifikasi" },
+            { id: 12, title: "Ujian Ksatria (Kuis)" },
+            { id: 13, title: "Gulungan Rangkuman" },
+            { id: 14, title: "Pustaka Agung" }
+        ];
+
+        function renderSlide(slideNum) {
+            const container = document.getElementById('slideContent');
+            let html = '';
+
+            switch(slideNum) {
+                // SLIDE 1
+                case 1:
+                    html = `
+                        <div class="text-center py-4 flex flex-col items-center justify-center space-y-4">
+                            <div class="wax-seal w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center border-4 border-yellow-300/60 shadow-xl glow-effect mb-1">
+                                <i class="fa-solid fa-feather-pointed text-amber-100 text-3xl sm:text-4xl"></i>
+                            </div>
+                            
+                            <span class="inline-block px-4 py-1 rounded-full bg-medieval-woodDark border border-medieval-gold/60 text-amber-300 font-cinzel text-xs tracking-wider uppercase shadow">
+                                Mata Pelajaran Bahasa Indonesia • Kelas XI SMA
+                            </span>
+
+                            <h2 class="font-cinzel font-extrabold text-2xl sm:text-4xl md:text-5xl text-medieval-wood leading-tight drop-shadow">
+                                MENGENALI MAJAS DALAM PUISI
+                            </h2>
+
+                            <p class="font-medieval text-base sm:text-xl text-medieval-crimson font-bold max-w-xl">
+                                Belajar Memahami Keindahan Bahasa & Gelora Jiwa dalam Puisi
+                            </p>
+
+                            <div class="w-24 h-1 bg-gradient-to-r from-transparent via-medieval-gold to-transparent my-2"></div>
+
+                            <button onclick="goToSlide(2)" class="mt-4 px-7 py-3.5 rounded-xl bg-gradient-to-r from-medieval-crimson via-red-800 to-medieval-crimson border-2 border-yellow-400 text-amber-100 font-cinzel font-bold text-sm sm:text-base shadow-xl hover:scale-105 active:scale-95 transition flex items-center space-x-3">
+                                <span>Mulai Petualangan Bahasa</span>
+                                <i class="fa-solid fa-scroll text-yellow-300"></i>
+                            </button>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 2
+                case 2:
+                    html = `
+                        <div class="space-y-4">
+                            <div class="text-center">
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold uppercase tracking-widest">Target Petualangan</span>
+                                <h2 class="font-cinzel text-xl sm:text-3xl font-extrabold text-medieval-wood">TUJUAN PEMBELAJARAN</h2>
+                                <p class="text-xs sm:text-sm text-medieval-ink/80 font-body">Klik setiap perisai untuk membuka misi pembelajaranmu!</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                                ${[
+                                    { id: 1, title: "1. Pengertian Majas", desc: "Menjelaskan pengertian majas dalam karya puisi dengan tepat." },
+                                    { id: 2, title: "2. Jenis-Jenis Majas", desc: "Menyebutkan dan mengelompokkan jenis-jenis majas utama." },
+                                    { id: 3, title: "3. Membedakan Majas", desc: "Membedakan majas metafora, personifikasi, hiperbola, dan simile." },
+                                    { id: 4, title: "4. Identifikasi Puisi", desc: "Mengidentifikasi penggunaan majas dalam kutipan puisi." },
+                                    { id: 5, title: "5. Analisis Makna", desc: "Menjelaskan alasan penggunaan majas berdasarkan konteks maknanya." }
+                                ].map(item => `
+                                    <div onclick="toggleShieldCard(${item.id})" class="p-3 bg-parchment-light/80 hover:bg-white border-2 border-medieval-border rounded-xl shadow-sm cursor-pointer transition transform hover:-translate-y-0.5 active:scale-98 flex items-start space-x-3 group">
+                                        <div class="wax-seal w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center text-amber-100 font-cinzel text-xs font-bold mt-0.5 group-hover:scale-110 transition">
+                                            <i class="fa-solid fa-shield-halved"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-cinzel font-bold text-sm text-medieval-wood group-hover:text-medieval-crimson transition">${item.title}</h4>
+                                            <p id="shieldText-${item.id}" class="text-xs text-medieval-ink/90 mt-1 font-body leading-relaxed">${item.desc}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 3
+                case 3:
+                    html = `
+                        <div class="space-y-4">
+                            <div class="text-center">
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold uppercase tracking-widest">Hakekat Kata</span>
+                                <h2 class="font-cinzel text-2xl sm:text-3xl font-extrabold text-medieval-wood">PENGERTIAN MAJAS</h2>
+                            </div>
+
+                            <div class="p-4 bg-parchment-light/90 border-2 border-medieval-border rounded-xl shadow-inner space-y-3">
+                                <p class="text-sm sm:text-base leading-relaxed text-medieval-ink">
+                                    <span class="font-bold text-medieval-crimson font-cinzel">Majas</span> adalah gaya bahasa yang digunakan untuk menyampaikan gagasan atau perasaan dengan cara yang lebih menarik, indah, dan memiliki makna kiasan tertentu.
+                                </p>
+                                <p class="text-xs sm:text-sm leading-relaxed text-medieval-ink/90">
+                                    Dalam puisi, majas berfungsi untuk memperindah bahasa, memperkuat pesan, serta membantu pembaca membayangkan suasana dan perasaan penyair.
+                                </p>
+                            </div>
+
+                            <!-- Interactive Example Card -->
+                            <div class="p-4 bg-medieval-woodDark text-amber-100 rounded-xl border-2 border-medieval-gold shadow-lg space-y-3">
+                                <div class="flex items-center justify-between border-b border-medieval-gold/30 pb-2">
+                                    <span class="font-medieval text-xs text-amber-300"><i class="fa-solid fa-scroll mr-1"></i> Contoh Kutipan:</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded bg-medieval-crimson font-cinzel">Interaktif</span>
+                                </div>
+                                <p class="font-medieval text-lg sm:text-xl text-center text-amber-200 py-1">
+                                    "Angin malam mengetuk jendela."
+                                </p>
+                                <button onclick="toggleBedahMajas3()" class="w-full py-2 bg-medieval-wood hover:bg-amber-950 border border-medieval-gold/40 rounded-lg text-xs font-cinzel text-amber-300 font-bold transition flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-magnifying-glass font-xs"></i>
+                                    <span>Klik untuk Bedah Majas</span>
+                                </button>
+                                <div id="bedahMajas3Content" class="hidden p-3 bg-amber-950/80 rounded-lg border border-amber-500/30 text-xs text-amber-200 font-body leading-relaxed">
+                                    <strong class="text-yellow-300 font-cinzel">Penjelasan:</strong> Kalimat ini mengumpamakan angin seolah-olah memiliki tangan manusia yang bisa mengetuk jendela. Ini memberi ruh kehidupan pada benda mati!
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 4
+                case 4:
+                    html = `
+                        <div class="space-y-3">
+                            <div class="text-center">
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold uppercase tracking-widest">Empat Cabang Kiasan</span>
+                                <h2 class="font-cinzel text-xl sm:text-3xl font-extrabold text-medieval-wood">JENIS-JENIS MAJAS PUISI</h2>
+                                <p class="text-xs text-medieval-ink/80">Klik kartu naskah di bawah untuk membuka ringkasan jenis majas!</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                                ${[
+                                    { num: "I", title: "Metafora", short: "Perbandingan langsung tanpa kata pembanding.", icon: "fa-crown", color: "from-amber-900 to-medieval-woodDark" },
+                                    { num: "II", title: "Personifikasi", short: "Benda mati/alam berprilaku seperti manusia.", icon: "fa-mask", color: "from-red-950 to-medieval-woodDark" },
+                                    { num: "III", title: "Hiperbola", short: "Ungkapan berlebihan untuk kesan mendalam.", icon: "fa-bolt", color: "from-amber-950 to-medieval-woodDark" },
+                                    { num: "IV", title: "Simile", short: "Perbandingan menggunakan kata pembanding.", icon: "fa-scale-balanced", color: "from-yellow-950 to-medieval-woodDark" }
+                                ].map((m, idx) => `
+                                    <div onclick="flipCardSlide4(${idx+1})" class="perspective-1000 h-28 sm:h-32 cursor-pointer">
+                                        <div id="cardInner-${idx+1}" class="transform-style-3d relative w-full h-full rounded-xl border-2 border-medieval-gold shadow-md">
+                                            <!-- Front -->
+                                            <div class="absolute inset-0 bg-gradient-to-br ${m.color} text-amber-100 p-3 rounded-xl flex flex-col justify-between backface-hidden">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="font-cinzel text-xs text-amber-400 font-bold">Majas #${m.num}</span>
+                                                    <i class="fa-solid ${m.icon} text-amber-400"></i>
+                                                </div>
+                                                <h3 class="font-cinzel font-bold text-lg text-amber-200 text-center">${m.title}</h3>
+                                                <span class="text-[10px] text-amber-300/70 text-right font-medieval">Klik untuk membalik ↺</span>
+                                            </div>
+                                            <!-- Back -->
+                                            <div class="absolute inset-0 bg-parchment-light text-medieval-ink p-3 rounded-xl rotate-y-180 backface-hidden flex flex-col justify-center text-center border-2 border-medieval-border">
+                                                <h4 class="font-cinzel font-bold text-sm text-medieval-crimson">${m.title}</h4>
+                                                <p class="text-xs text-medieval-ink/90 mt-1 font-body">${m.short}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 5
+                case 5:
+                    html = `
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3 border-b-2 border-medieval-border pb-2">
+                                <div class="wax-seal w-10 h-10 rounded-full flex items-center justify-center text-amber-100 font-cinzel font-bold text-base">
+                                    I
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-cinzel text-medieval-crimson font-bold uppercase">Majas Perbandingan Langsung</span>
+                                    <h2 class="font-cinzel text-xl sm:text-2xl font-extrabold text-medieval-wood">MAJAS METAFORA</h2>
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 bg-parchment-light rounded-xl border border-medieval-border shadow-sm">
+                                <h4 class="font-cinzel font-bold text-xs text-medieval-crimson uppercase tracking-wider mb-1">Pengertian:</h4>
+                                <p class="text-xs sm:text-sm text-medieval-ink leading-relaxed">
+                                    Gaya bahasa yang membandingkan dua hal secara <strong>langsung</strong> tanpa menggunakan kata pembanding (seperti <em>bagai, seperti, laksana</em>).
+                                </p>
+                            </div>
+
+                            <div class="p-4 bg-medieval-woodDark text-amber-100 rounded-xl border-2 border-medieval-gold shadow-md space-y-3">
+                                <div class="text-xs font-cinzel text-amber-400 font-bold"><i class="fa-solid fa-gem mr-1"></i> Contoh Utama:</div>
+                                <div class="text-base sm:text-lg text-center font-medieval text-yellow-200 bg-amber-950/60 py-2 px-3 rounded-lg border border-amber-500/30">
+                                    "Kakak adalah <span class="text-amber-400 underline decoration-wavy">tulang punggung</span> keluarga."
+                                </div>
+
+                                <button onclick="toggleModalMetafora()" class="w-full py-2 bg-medieval-crimson hover:bg-red-900 rounded-lg text-xs font-cinzel text-amber-100 font-bold transition flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-scroll"></i>
+                                    <span>Bedah Makna Mendalam</span>
+                                </button>
+                                
+                                <div id="metaforaDetail" class="hidden p-3 bg-black/40 rounded-lg border border-medieval-gold/40 text-xs text-amber-200 leading-relaxed font-body">
+                                    <strong class="text-yellow-300 font-cinzel">Penjelasan:</strong> Ungkapan "tulang punggung keluarga" bukan berarti kakak menjadi tulang fisik manusia. Maknanya adalah kakak menjadi penopang utama dan penanggung jawab kebutuhan seluruh anggota keluarga.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 6
+                case 6:
+                    html = `
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 border-b-2 border-medieval-border pb-2">
+                                <div class="wax-seal w-10 h-10 rounded-full flex items-center justify-center text-amber-100 font-cinzel font-bold text-base">
+                                    II
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-cinzel text-medieval-crimson font-bold uppercase">Sifat Manusia Pada Alam</span>
+                                    <h2 class="font-cinzel text-xl sm:text-2xl font-extrabold text-medieval-wood">MAJAS PERSONIFIKASI</h2>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-parchment-light rounded-xl border border-medieval-border">
+                                <h4 class="font-cinzel font-bold text-xs text-medieval-crimson uppercase tracking-wider mb-1">Pengertian:</h4>
+                                <p class="text-xs sm:text-sm text-medieval-ink leading-relaxed">
+                                    Gaya bahasa yang menggambarkan <strong>benda mati, tumbuhan, atau alam</strong> seolah-olah memiliki sifat atau dapat melakukan tindakan layaknya manusia.
+                                </p>
+                            </div>
+
+                            <!-- Interactive Visual Box -->
+                            <div class="p-4 bg-medieval-woodDark text-amber-100 rounded-xl border-2 border-medieval-gold shadow-md text-center space-y-2">
+                                <span class="text-xs font-cinzel text-amber-400 font-bold">Simulasi Visual Animasi</span>
+                                <div class="p-3 bg-amber-950/70 rounded-lg border border-amber-500/30 flex flex-col items-center justify-center min-h-[90px]">
+                                    <p id="personifikasiVisualText" class="font-medieval text-base sm:text-lg text-amber-200">
+                                        "Angin malam mengetuk jendela."
+                                    </p>
+                                    <div id="windAnimIcon" class="mt-2 text-amber-300 text-2xl transition duration-500">
+                                        <i class="fa-solid fa-wind animate-pulse"></i> <i class="fa-solid fa-hand-pointer text-sm animate-bounce ml-2"></i> <i class="fa-solid fa-door-closed"></i>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-amber-300/90 font-body">
+                                    <strong class="text-amber-200">Penjelasan:</strong> Angin sebenarnya tidak punya tangan untuk mengetuk. Pemberian sifat manusia ini membuat suasana puisi menjadi lebih hidup dan dramatis.
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 7
+                case 7:
+                    html = `
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3 border-b-2 border-medieval-border pb-2">
+                                <div class="wax-seal w-10 h-10 rounded-full flex items-center justify-center text-amber-100 font-cinzel font-bold text-base">
+                                    III
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-cinzel text-medieval-crimson font-bold uppercase">Ungkapan Serba Disesaki Drama</span>
+                                    <h2 class="font-cinzel text-xl sm:text-2xl font-extrabold text-medieval-wood">MAJAS HIPERBOLA</h2>
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 bg-parchment-light rounded-xl border border-medieval-border">
+                                <h4 class="font-cinzel font-bold text-xs text-medieval-crimson uppercase tracking-wider mb-1">Pengertian:</h4>
+                                <p class="text-xs sm:text-sm text-medieval-ink leading-relaxed">
+                                    Gaya bahasa yang menggunakan ungkapan secara <strong>dilebih-lebihkan</strong> dari kenyataan sebenarnya untuk memberikan penekanan atau kesan teramat kuat.
+                                </p>
+                            </div>
+
+                            <!-- Interactive Exaggeration Slider -->
+                            <div class="p-4 bg-medieval-woodDark text-amber-100 rounded-xl border-2 border-medieval-gold shadow-md space-y-3">
+                                <div class="text-xs font-cinzel text-amber-400 font-bold flex justify-between">
+                                    <span><i class="fa-solid fa-bolt mr-1"></i> Contoh Kutipan:</span>
+                                    <span id="sliderYearsText" class="text-yellow-300">Skala: 1000 Tahun</span>
+                                </div>
+
+                                <div class="text-center font-medieval text-base sm:text-xl text-yellow-200 bg-amber-950/70 p-3 rounded-lg border border-amber-500/30">
+                                    "Aku sudah menunggumu selama <span id="yearsVal" class="text-yellow-400 font-bold underline">1000</span> tahun."
+                                </div>
+
+                                <div class="space-y-1">
+                                    <label class="text-[11px] text-amber-300 font-cinzel flex justify-between">
+                                        <span>Geser Skala Berlebihan:</span>
+                                        <span>0 thn → 1000 thn</span>
+                                    </label>
+                                    <input type="range" min="1" max="1000" value="1000" id="hyperboleSlider" oninput="updateHyperboleSlider(this.value)" class="w-full accent-amber-500 cursor-pointer">
+                                </div>
+
+                                <div class="p-2.5 bg-black/40 rounded-lg text-xs text-amber-200 font-body">
+                                    <strong class="text-yellow-300 font-cinzel">Penjelasan:</strong> Mana mungkin manusia hidup menunggu 1000 tahun! Kata ini sengaja dilebih-lebihkan untuk menegaskan lamanya rasa menunggu.
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 8
+                case 8:
+                    html = `
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-3 border-b-2 border-medieval-border pb-2">
+                                <div class="wax-seal w-10 h-10 rounded-full flex items-center justify-center text-amber-100 font-cinzel font-bold text-base">
+                                    IV
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-cinzel text-medieval-crimson font-bold uppercase">Perbandingan Menggunakan Kata Kunci</span>
+                                    <h2 class="font-cinzel text-xl sm:text-2xl font-extrabold text-medieval-wood">MAJAS SIMILE</h2>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-parchment-light rounded-xl border border-medieval-border">
+                                <h4 class="font-cinzel font-bold text-xs text-medieval-crimson uppercase tracking-wider mb-1">Pengertian:</h4>
+                                <p class="text-xs sm:text-sm text-medieval-ink leading-relaxed">
+                                    Gaya bahasa yang membandingkan dua hal secara tidak langsung dengan menggunakan <strong>kata pembanding eksplisit</strong>.
+                                </p>
+                            </div>
+
+                            <!-- Interactive Keyword Badges -->
+                            <div class="space-y-1.5">
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold">Kata Pembanding Khas (Klik untuk Sorot):</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${['seperti', 'bagai', 'bagaikan', 'laksana', 'ibarat'].map(w => `
+                                        <button onclick="highlightSimileWord('${w}')" class="px-3 py-1 bg-medieval-wood text-amber-200 hover:bg-medieval-crimson border border-medieval-gold/50 rounded-lg text-xs font-medieval transition active:scale-95">
+                                            ${w}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div class="p-3.5 bg-medieval-woodDark text-amber-100 rounded-xl border-2 border-medieval-gold shadow-md space-y-2">
+                                <div class="text-xs font-cinzel text-amber-400 font-bold">Contoh Utama:</div>
+                                <div class="text-base sm:text-lg text-center font-medieval text-yellow-200 bg-amber-950/70 py-2 rounded-lg border border-amber-500/30">
+                                    "Senyummu <span id="simileHighlightTarget" class="text-yellow-400 font-bold underline px-1">bagai</span> cahaya pagi."
+                                </div>
+                                <p class="text-xs text-amber-200/90 font-body">
+                                    <strong class="text-yellow-300 font-cinzel">Penjelasan:</strong> Senyum seseorang disandingkan dengan kehangatan cahaya pagi melalui kata penjelas <em>"bagai"</em>.
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 9
+                case 9:
+                    html = `
+                        <div class="space-y-4">
+                            <div class="text-center">
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold uppercase tracking-widest">Komparasi Agung</span>
+                                <h2 class="font-cinzel text-xl sm:text-3xl font-extrabold text-medieval-wood">METAFORA VS SIMILE</h2>
+                                <p class="text-xs text-medieval-ink/80">Perhatikan perbedaan mendasar dalam struktur kalimat berikut:</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <!-- Metafora Side -->
+                                <div class="p-4 bg-medieval-woodDark text-amber-100 rounded-xl border-2 border-medieval-gold shadow-md flex flex-col justify-between space-y-2">
+                                    <div>
+                                        <div class="flex items-center justify-between border-b border-medieval-gold/30 pb-1 mb-2">
+                                            <span class="font-cinzel font-bold text-sm text-yellow-300">METAFORA</span>
+                                            <span class="text-[10px] bg-red-900 px-2 py-0.5 rounded text-amber-200 font-cinzel">Tanpa Kata Pembanding</span>
+                                        </div>
+                                        <p class="text-xs text-amber-200/90 font-body mb-3">Perbandingan disampaikan secara langsung.</p>
+                                        <div class="p-2.5 bg-amber-950/80 rounded-lg text-center font-medieval text-sm sm:text-base text-yellow-200 border border-amber-500/30">
+                                            "Ibu <span class="text-yellow-400 font-bold underline">adalah</span> pelita hidupku."
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] text-amber-400/80 text-center font-cinzel">Langsung mengibaratkan A = B</span>
+                                </div>
+
+                                <!-- Simile Side -->
+                                <div class="p-4 bg-medieval-woodDark text-amber-100 rounded-xl border-2 border-medieval-gold shadow-md flex flex-col justify-between space-y-2">
+                                    <div>
+                                        <div class="flex items-center justify-between border-b border-medieval-gold/30 pb-1 mb-2">
+                                            <span class="font-cinzel font-bold text-sm text-yellow-300">SIMILE</span>
+                                            <span class="text-[10px] bg-emerald-900 px-2 py-0.5 rounded text-amber-200 font-cinzel">Ada Kata Pembanding</span>
+                                        </div>
+                                        <p class="text-xs text-amber-200/90 font-body mb-3">Perbandingan memakai kata penyambung.</p>
+                                        <div class="p-2.5 bg-amber-950/80 rounded-lg text-center font-medieval text-sm sm:text-base text-yellow-200 border border-amber-500/30">
+                                            "Ibu <span class="text-yellow-400 font-bold underline">bagai</span> pelita dalam hidupku."
+                                        </div>
+                                    </div>
+                                    <span class="text-[10px] text-amber-400/80 text-center font-cinzel">Menggunakan "bagai/seperti/laksana"</span>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-parchment-light border-2 border-medieval-border rounded-xl text-center">
+                                <h4 class="font-cinzel font-bold text-xs text-medieval-crimson uppercase">Kunci Ringkas Kesimpulan:</h4>
+                                <p class="text-xs text-medieval-ink font-body mt-0.5">
+                                    <strong>Metafora</strong> memangkas kata pembanding, sedangkan <strong>Simile</strong> wajib menghadirkan kata pembanding!
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 10
+                case 10:
+                    html = `
+                        <div class="space-y-3">
+                            <div class="text-center">
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold uppercase tracking-widest">Laboratorium Puisi</span>
+                                <h2 class="font-cinzel text-xl sm:text-2xl font-extrabold text-medieval-wood">BEDAH PUISI INTERAKTIF</h2>
+                                <p class="text-xs text-medieval-ink/80">Klik setiap baris puisi untuk menguak majas dan analisisnya!</p>
+                            </div>
+
+                            <div class="p-4 bg-medieval-woodDark border-2 border-medieval-gold rounded-xl shadow-lg">
+                                <div class="text-center border-b border-medieval-gold/30 pb-2 mb-3">
+                                    <h3 class="font-gothic text-xl sm:text-2xl text-yellow-300 tracking-wide">"RINDU DI UJUNG SENJA"</h3>
+                                </div>
+
+                                <div class="space-y-2">
+                                    ${[
+                                        { line: 1, text: "Angin malam mengetuk jendela,", type: "Personifikasi", desc: "Angin digambarkan dapat mengetuk jendela seolah-olah memiliki tangan manusia." },
+                                        { line: 2, text: "Bintang tersenyum di langit senja,", type: "Personifikasi", desc: "Bintang diumpamakan bisa tersenyum ramah layaknya manusia." },
+                                        { line: 3, text: "Rindu menggunung tanpa batas,", type: "Hiperbola", desc: "Mengekspresikan besarnya rasa rindu secara dilebih-lebihkan setinggi gunung." },
+                                        { line: 4, text: "Hatimu bagai cahaya yang membekas.", type: "Simile", desc: "Menggunakan kata pembanding 'bagai' untuk menyandingkan hati dengan cahaya." }
+                                    ].map(item => `
+                                        <div onclick="analyzePoemLine(${item.line})" class="p-2.5 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 rounded-lg cursor-pointer transition active:scale-98">
+                                            <div class="flex justify-between items-center">
+                                                <p class="font-medieval text-sm sm:text-base text-yellow-100">"${item.text}"</p>
+                                                <span class="text-[10px] font-cinzel text-amber-400 bg-black/40 px-2 py-0.5 rounded">Klik <i class="fa-solid fa-chevron-down ml-1"></i></span>
+                                            </div>
+                                            <div id="poemAnalysis-${item.line}" class="hidden mt-2 pt-2 border-t border-amber-500/20 text-xs text-amber-200 font-body">
+                                                <span class="font-cinzel font-bold text-yellow-300 bg-medieval-crimson px-2 py-0.5 rounded text-[10px] mr-2">${item.type}</span>
+                                                ${item.desc}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 11
+                case 11:
+                    html = `
+                        <div class="space-y-3">
+                            <div class="text-center">
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold uppercase tracking-widest">Panduan Ksatria</span>
+                                <h2 class="font-cinzel text-xl sm:text-2xl font-extrabold text-medieval-wood">5 LANGKAH IDENTIFIKASI MAJAS</h2>
+                            </div>
+
+                            <div class="space-y-2 mt-2">
+                                ${[
+                                    { step: 1, name: "1. Baca", desc: "Pahami isi dan suasana kutipan puisi secara menyeluruh." },
+                                    { step: 2, name: "2. Tandai", desc: "Perhatikan kata atau ungkapan yang terasa unik dan menarik perhatian." },
+                                    { step: 3, name: "3. Periksa", desc: "Cari tanda perbandingan, sifat manusia pada benda, atau ungkapan berlebihan." },
+                                    { step: 4, name: "4. Tentukan", desc: "Pilih jenis majas yang paling tepat berdasarkan ciri utamanya." },
+                                    { step: 5, name: "5. Jelaskan", desc: "Berikan alasan logis berdasarkan konteks kata dalam puisi." }
+                                ].map(s => `
+                                    <div onclick="highlightStep(${s.step})" class="p-2.5 bg-parchment-light hover:bg-white border-2 border-medieval-border rounded-xl shadow-sm cursor-pointer transition flex items-center space-x-3">
+                                        <div class="wax-seal w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center text-amber-100 font-cinzel text-xs font-bold">
+                                            ${s.step}
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4 class="font-cinzel font-bold text-xs text-medieval-crimson">${s.name}</h4>
+                                            <p class="text-[11px] sm:text-xs text-medieval-ink/90 font-body">${s.desc}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 12
+                case 12:
+                    html = `
+                        <div class="space-y-3">
+                            <div class="text-center">
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold uppercase tracking-widest">Ujian Pemahaman</span>
+                                <h2 class="font-cinzel text-xl sm:text-2xl font-extrabold text-medieval-wood">UJIAN KSATRIA BAHASA</h2>
+                                <p class="text-xs text-medieval-ink/80">Tentukan jenis majas untuk setiap ungkapan di bawah ini!</p>
+                            </div>
+
+                            <div class="space-y-3 max-h-[340px] overflow-y-auto pr-1">
+                                ${[
+                                    { qId: 1, text: '1. "Ombak berkejaran menuju pantai."' },
+                                    { qId: 2, text: '2. "Kakak adalah tulang punggung keluarga."' },
+                                    { qId: 3, text: '3. "Aku sudah menunggumu seribu tahun."' },
+                                    { qId: 4, text: '4. "Wajahnya bersinar seperti bulan."' }
+                                ].map(q => `
+                                    <div class="p-3 bg-medieval-woodDark rounded-xl border border-medieval-gold/60 text-amber-100 space-y-2">
+                                        <p class="font-medieval text-xs sm:text-sm text-yellow-200">${q.text}</p>
+                                        <div class="grid grid-cols-2 gap-1.5">
+                                            ${[
+                                                { code: 'A', label: 'Metafora' },
+                                                { code: 'B', label: 'Personifikasi' },
+                                                { code: 'C', label: 'Hiperbola' },
+                                                { code: 'D', label: 'Simile' }
+                                            ].map(opt => `
+                                                <button onclick="selectAnswer(${q.qId}, '${opt.code}')" id="btn-q${q.qId}-${opt.code}" class="quiz-btn-${q.qId} px-2 py-1.5 bg-medieval-wood hover:bg-amber-900 border border-amber-500/40 rounded text-xs font-cinzel text-amber-200 text-left transition flex items-center justify-between">
+                                                    <span><strong>${opt.code}.</strong> ${opt.label}</span>
+                                                    <i id="icon-q${q.qId}-${opt.code}" class="fa-regular fa-circle text-[10px] text-amber-400"></i>
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                        <div id="feedback-q${q.qId}" class="hidden text-[11px] font-body p-1.5 rounded"></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+
+                            <div class="flex items-center justify-between pt-1 border-t border-medieval-border">
+                                <span id="quizScoreBadge" class="font-cinzel text-xs font-bold text-medieval-crimson">Skor Kamu: 0 / 4</span>
+                                <button onclick="resetQuiz()" class="px-3 py-1 bg-medieval-wood text-amber-200 border border-medieval-gold/40 rounded text-xs font-cinzel hover:bg-amber-950">
+                                    <i class="fa-solid fa-rotate-right mr-1"></i> Coba Lagi
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 13
+                case 13:
+                    html = `
+                        <div class="space-y-4">
+                            <div class="text-center">
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold uppercase tracking-widest">Intisari Ilmu</span>
+                                <h2 class="font-cinzel text-xl sm:text-3xl font-extrabold text-medieval-wood">GULUNGAN RANGKUMAN</h2>
+                            </div>
+
+                            <div class="p-4 bg-parchment-light border-2 border-medieval-border rounded-xl space-y-3 shadow-inner">
+                                <div class="flex items-start space-x-2">
+                                    <span class="wax-seal w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] text-amber-100 font-bold mt-0.5">1</span>
+                                    <p class="text-xs sm:text-sm text-medieval-ink font-body">
+                                        <strong class="font-cinzel text-medieval-crimson">Metafora:</strong> Perbandingan dua hal secara langsung tanpa kata pembanding.
+                                    </p>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <span class="wax-seal w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] text-amber-100 font-bold mt-0.5">2</span>
+                                    <p class="text-xs sm:text-sm text-medieval-ink font-body">
+                                        <strong class="font-cinzel text-medieval-crimson">Personifikasi:</strong> Menggambarkan benda mati atau alam seolah berprilaku layaknya manusia.
+                                    </p>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <span class="wax-seal w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] text-amber-100 font-bold mt-0.5">3</span>
+                                    <p class="text-xs sm:text-sm text-medieval-ink font-body">
+                                        <strong class="font-cinzel text-medieval-crimson">Hiperbola:</strong> Ungkapan dilebih-lebihkan untuk memberi impresi dan penekanan mendalam.
+                                    </p>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <span class="wax-seal w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] text-amber-100 font-bold mt-0.5">4</span>
+                                    <p class="text-xs sm:text-sm text-medieval-ink font-body">
+                                        <strong class="font-cinzel text-medieval-crimson">Simile:</strong> Perbandingan eksplisit menggunakan kata penyambung seperti <em>seperti, bagai, laksana, ibarat</em>.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-medieval-woodDark text-amber-200 rounded-xl text-center border border-medieval-gold/40 text-xs font-medieval">
+                                "Menguasai majas membuka pintu keindahan menyelami makna puisi penyair agung!"
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                // SLIDE 14
+                case 14:
+                    html = `
+                        <div class="space-y-4 text-center">
+                            <div>
+                                <span class="text-xs font-cinzel text-medieval-crimson font-bold uppercase tracking-widest">Sumber Literatur</span>
+                                <h2 class="font-cinzel text-2xl sm:text-3xl font-extrabold text-medieval-wood">PUSTAKA AGUNG</h2>
+                            </div>
+
+                            <div class="wax-seal w-16 h-16 rounded-full mx-auto flex items-center justify-center text-amber-100 text-2xl shadow-lg border-2 border-yellow-300">
+                                <i class="fa-solid fa-book-bookmark"></i>
+                            </div>
+
+                            <div class="space-y-3 max-w-lg mx-auto text-left">
+                                <div class="p-3 bg-parchment-light border-2 border-medieval-border rounded-xl shadow-sm flex items-start space-x-3">
+                                    <i class="fa-solid fa-scroll text-medieval-crimson mt-1 text-sm"></i>
+                                    <p class="text-xs sm:text-sm text-medieval-ink font-body leading-relaxed">
+                                        <strong>Keraf, Gorys.</strong> (2009). <em>Diksi dan Gaya Bahasa</em>. Jakarta: Gramedia Pustaka Utama.
+                                    </p>
+                                </div>
+
+                                <div class="p-3 bg-parchment-light border-2 border-medieval-border rounded-xl shadow-sm flex items-start space-x-3">
+                                    <i class="fa-solid fa-scroll text-medieval-crimson mt-1 text-sm"></i>
+                                    <p class="text-xs sm:text-sm text-medieval-ink font-body leading-relaxed">
+                                        <strong>Tarigan, Henry Guntur.</strong> (2013). <em>Pengajaran Gaya Bahasa</em>. Bandung: Angkasa.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <button onclick="goToSlide(1)" class="px-6 py-2.5 bg-medieval-wood hover:bg-amber-950 border border-medieval-gold text-amber-300 rounded-xl font-cinzel text-xs sm:text-sm font-bold transition">
+                                    <i class="fa-solid fa-arrow-rotate-left mr-2"></i> Ulang Petualangan Dari Awal
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                default:
+                    html = `<div>Slide tidak ditemukan.</div>`;
+            }
+
+            container.innerHTML = html;
+            updateUIState();
+            
+            // Restore quiz visual state if on slide 12
+            if (slideNum === 12) {
+                restoreQuizUI();
+            }
+        }
+
+        function updateUIState() {
+            document.getElementById('currentSlideNum').innerText = currentSlide;
+            document.getElementById('slideTitleMini').innerText = slidesData[currentSlide - 1].title;
+            
+            // Progress Bar
+            const percentage = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+
+            // Prev & Next Button states
+            document.getElementById('prevBtn').disabled = (currentSlide === 1);
+            document.getElementById('nextBtn').disabled = (currentSlide === totalSlides);
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                playHarpSound();
+                renderSlide(currentSlide);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                playHarpSound();
+                renderSlide(currentSlide);
+            }
+        }
+
+        function goToSlide(num) {
+            if (num >= 1 && num <= totalSlides) {
+                currentSlide = num;
+                playHarpSound();
+                renderSlide(currentSlide);
+                closeSlideMap();
+            }
+        }
+
+        // Slide Map Modal Functions
+        function openSlideMap() {
+            playClickSound();
+            const modal = document.getElementById('slideMapModal');
+            const grid = document.getElementById('slideMapGrid');
+            
+            grid.innerHTML = slidesData.map(s => `
+                <button onclick="goToSlide(${s.id})" class="p-2.5 rounded-xl text-left border transition ${s.id === currentSlide ? 'bg-medieval-crimson text-yellow-200 border-amber-400' : 'bg-medieval-woodDark/80 hover:bg-amber-950 text-amber-300 border-medieval-gold/30'} flex items-center space-x-2">
+                    <span class="wax-seal w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-amber-100">${s.id}</span>
+                    <span class="font-cinzel text-xs font-semibold truncate">${s.title}</span>
+                </button>
+            `).join('');
+
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeSlideMap() {
+            const modal = document.getElementById('slideMapModal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // SLIDE SPECIFIC INTERACTION HELPERS
+        function toggleShieldCard(id) {
+            playClickSound();
+            const el = document.getElementById(`shieldText-${id}`);
+            if (el) {
+                el.classList.toggle('font-bold');
+                el.classList.toggle('text-medieval-crimson');
+            }
+        }
+
+        function toggleBedahMajas3() {
+            playClickSound();
+            const content = document.getElementById('bedahMajas3Content');
+            if (content) content.classList.toggle('hidden');
+        }
+
+        function flipCardSlide4(idx) {
+            playClickSound();
+            const cardInner = document.getElementById(`cardInner-${idx}`);
+            if (cardInner) {
+                cardInner.classList.toggle('flipped');
+            }
+        }
+
+        function toggleModalMetafora() {
+            playClickSound();
+            const el = document.getElementById('metaforaDetail');
+            if (el) el.classList.toggle('hidden');
+        }
+
+        function updateHyperboleSlider(val) {
+            const valSpan = document.getElementById('yearsVal');
+            const labelSpan = document.getElementById('sliderYearsText');
+            if (valSpan) valSpan.innerText = val;
+            if (labelSpan) labelSpan.innerText = `Skala: ${val} Tahun`;
+        }
+
+        function highlightSimileWord(word) {
+            playClickSound();
+            const target = document.getElementById('simileHighlightTarget');
+            if (target) {
+                target.innerText = word;
+                target.classList.add('scale-110', 'text-amber-300');
+                setTimeout(() => target.classList.remove('scale-110'), 300);
+            }
+        }
+
+        function analyzePoemLine(lineNum) {
+            playClickSound();
+            const el = document.getElementById(`poemAnalysis-${lineNum}`);
+            if (el) {
+                el.classList.toggle('hidden');
+            }
+        }
+
+        function highlightStep(stepNum) {
+            playClickSound();
+        }
+
+        // QUIZ SYSTEM LOGIC
+        function selectAnswer(qId, selectedOption) {
+            quizAnswers[qId] = selectedOption;
+            const isCorrect = (selectedOption === correctQuizAnswers[qId]);
+
+            if (isCorrect) {
+                playCorrectSound();
+            } else {
+                playWrongSound();
+            }
+
+            restoreQuizUI();
+        }
+
+        function restoreQuizUI() {
+            let correctCount = 0;
+
+            for (let qId = 1; qId <= 4; qId++) {
+                const selected = quizAnswers[qId];
+                const correctOpt = correctQuizAnswers[qId];
+                const feedbackEl = document.getElementById(`feedback-q${qId}`);
+
+                // Clear buttons styling
+                ['A', 'B', 'C', 'D'].forEach(opt => {
+                    const btn = document.getElementById(`btn-q${qId}-${opt}`);
+                    const icon = document.getElementById(`icon-q${qId}-${opt}`);
+                    if (!btn) return;
+
+                    btn.className = `quiz-btn-${qId} px-2 py-1.5 bg-medieval-wood hover:bg-amber-900 border border-amber-500/40 rounded text-xs font-cinzel text-amber-200 text-left transition flex items-center justify-between`;
+                    icon.className = "fa-regular fa-circle text-[10px] text-amber-400";
+
+                    if (selected) {
+                        if (opt === correctOpt) {
+                            btn.className = `quiz-btn-${qId} px-2 py-1.5 bg-emerald-900 border-2 border-emerald-400 rounded text-xs font-cinzel text-emerald-100 text-left transition flex items-center justify-between`;
+                            icon.className = "fa-solid fa-circle-check text-[10px] text-emerald-300";
+                        } else if (opt === selected) {
+                            btn.className = `quiz-btn-${qId} px-2 py-1.5 bg-red-950 border-2 border-red-500 rounded text-xs font-cinzel text-red-200 text-left transition flex items-center justify-between`;
+                            icon.className = "fa-solid fa-circle-xmark text-[10px] text-red-400";
+                        }
+                    }
+                });
+
+                if (selected) {
+                    if (selected === correctOpt) {
+                        correctCount++;
+                        if (feedbackEl) {
+                            feedbackEl.className = "text-[11px] font-body p-1.5 rounded bg-emerald-950/80 border border-emerald-500/40 text-emerald-200";
+                            feedbackEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i> Tepat Sekali, Ksatria! (Jawaban: ${correctOpt})`;
+                            feedbackEl.classList.remove('hidden');
+                        }
+                    } else {
+                        if (feedbackEl) {
+                            feedbackEl.className = "text-[11px] font-body p-1.5 rounded bg-red-950/80 border border-red-500/40 text-red-200";
+                            feedbackEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400 mr-1"></i> Kurang Tepat. Jawaban Benar adalah: ${correctOpt}`;
+                            feedbackEl.classList.remove('hidden');
+                        }
+                    }
+                }
+            }
+
+            const scoreBadge = document.getElementById('quizScoreBadge');
+            if (scoreBadge) {
+                scoreBadge.innerText = `Skor Kamu: ${correctCount} / 4`;
+            }
+        }
+
+        function resetQuiz() {
+            playClickSound();
+            for (let qId in quizAnswers) {
+                quizAnswers[qId] = null;
+            }
+            restoreQuizUI();
+        }
+
+        // TOUCH SWIPE NAVIGATION FOR MOBILE (ANDROID & IOS)
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const threshold = 50;
+            if (touchEndX < touchStartX - threshold) {
+                // Swipe Left -> Next
+                nextSlide();
+            }
+            if (touchEndX > touchStartX + threshold) {
+                // Swipe Right -> Prev
+                prevSlide();
+            }
+        }
+
+        // INITIALIZE APP ON LOAD
+        window.onload = function() {
+            renderSlide(1);
+        };
+    </script>
+</body>
+</html>
